@@ -75,11 +75,9 @@ struct binary_search_tree
 	node_pointer_type search(key_const_reference_type key)
 	{
 		node_pointer_type x = root;
-		while (x!=nullptr)
+		while (x!=nullptr && x->key != key)
 		{
-			if (x->key == key)
-				break;
-			else if (key < x->key)
+			if (key < x->key)
 				x = x->left;
 			else
 				x = x->right;
@@ -102,9 +100,23 @@ struct binary_search_tree
 			}
 			else
 			{
-				//auto y = minium();
+				auto y = tree_minimum(root);
+				if (y->p != z)
+				{
+					trans_plant(y, y->right);
+					y->right = z->right;
+					y->right->p = y;
+				}
+				trans_plant(z, y);
+				y->left = z->left;
+				y->left->p = y;
 			}
 		}
+	}
+
+	node_pointer_type minimum()
+	{
+		return tree_minimum(root);
 	}
 
 private:
@@ -122,10 +134,21 @@ private:
 		if (v != nullptr)
 			v->p = u->p;
 	}
+
+	static node_pointer_type tree_minimum(node_pointer_type root)
+	{
+		node_pointer_type y = nullptr;
+		while (root)
+		{
+			y = root;
+			root = root->left;
+		}
+		return y;
+	}
 };
 
 template<typename _KeyType>
-void LevelOutput(const binary_tree_node<_KeyType>* root)
+void level_tree_walk(const binary_tree_node<_KeyType>* root)
 {
 	std::queue<const binary_tree_node<_KeyType>*> q;
 	if (root)
@@ -157,18 +180,6 @@ void inorder_tree_walk(const binary_tree_node<_KeyType>* root)
 	}
 }
 
-template<typename _KeyType>
-auto tree_minimum(const binary_tree_node<_KeyType>* root)
-{
-	decltype(root) y = nullptr;
-	while (root)
-	{
-		y = root;
-		root = root->left;
-	}
-	return y;
-}
-
 int main()
 {
 	binary_search_tree<int> tree;
@@ -177,10 +188,19 @@ int main()
 	{
 		tree.insert(a);
 	}
-	LevelOutput(tree.root);
-	inorder_tree_walk(tree.root);
 
-	auto pMin = tree_minimum(tree.root);
+	for (size_t i = 0; i < _countof(data); i++)
+	{
+		std::cout << "层级遍历：";
+		level_tree_walk(tree.root);
+		std::cout << "中序遍历：";
+		inorder_tree_walk(tree.root);
+		std::cout << "\n";
+		auto p_min = tree.minimum();
+		std::cout << "删除最小值：" << p_min->key << "\n";
+		
+		tree.delete_key(p_min->key);
+	}
 
 	return 0;
 }

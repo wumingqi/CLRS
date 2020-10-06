@@ -195,7 +195,7 @@ private:
 		
 		// 1、使用x的右孩子代替x成为y的左孩子
 		y->left = x->right;
-		if (x->right)
+		if (x->right != nil_node)
 			x->right->p = y;
 
 		// 2、使用x代替y，占有y原来的位置

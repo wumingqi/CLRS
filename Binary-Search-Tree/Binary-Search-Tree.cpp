@@ -100,7 +100,7 @@ struct binary_search_tree
 			}
 			else
 			{
-				auto y = tree_minimum(root);
+				auto y = tree_minimum(z->right);
 				if (y->p != z)
 				{
 					trans_plant(y, y->right);
